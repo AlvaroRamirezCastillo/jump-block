@@ -19,6 +19,7 @@ export class AppComponent {
   private dc = inject(ChangeDetectorRef);
 
   offerControl = new FormControl('');
+  messageControl = new FormControl('');
   offerDesc = '';
 
   message = signal('');
@@ -95,9 +96,7 @@ export class AppComponent {
   }
 
   sendData() {
-    const data = 'hello Moni';
-    this.sendChannel.send(data);
-    console.log('Sent Data: ' + data);
+    this.sendChannel.send(this.messageControl.value || '');
   }
 
   closeDataChannels() {
