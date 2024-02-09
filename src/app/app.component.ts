@@ -20,7 +20,9 @@ export class AppComponent {
 
   offerControl = new FormControl('');
   messageControl = new FormControl('');
+  candidateControl = new FormControl('');
   offerDesc = '';
+  candidate: any;
 
   message = signal('');
 
@@ -29,7 +31,7 @@ export class AppComponent {
     this.hostConnection = new RTCPeerConnection();
     this.sendChannel = this.hostConnection.createDataChannel('sendDataChannel');
     this.hostConnection.onicecandidate = (e: any) => {
-      this.onIceCandidate(this.hostConnection, e);
+      this.remoteConnection.addIceCandidate(e.candidate!);
     };
     this.sendChannel.onopen = () => { this.onSendChannelStateChange() };
     this.sendChannel.onclose = () => { this.onSendChannelStateChange() };
@@ -39,33 +41,27 @@ export class AppComponent {
     this.gotDescription();
   }
 
-  createConnectionRemote() {
-    this.remoteConnection = new RTCPeerConnection();
-    this.remoteConnection.onicecandidate = (e: any) => {
-      this.onIceCandidate(this.remoteConnection, e);
-    };
-    this.remoteConnection.ondatachannel = (event: any) => { this.receiveChannelCallback(event) };
+  syncHost() {
+    this.hostConnection.addIceCandidate(JSON.parse(this.candidateControl.value!));
+  }
 
+  async createConnectionRemote() {
+    this.remoteConnection = new RTCPeerConnection();
+    this.remoteConnection.ondatachannel = (event: any) => { this.receiveChannelCallback(event) };
     const offer: any = JSON.parse(this.offerControl.value || '{}');
     this.remoteConnection.setRemoteDescription(offer);
-    this.remoteConnection.createAnswer()
-      .then((desc1: RTCSessionDescriptionInit) => {
-        this.remoteConnection.setLocalDescription(desc1);
-        console.log(`Answer from remoteConnection`);
-        this.hostConnection.setRemoteDescription(desc1);
-      })
-      .catch((error: any) => console.log(`Failed to add Ice Candidate: ${error.toString()}`));
-  }
+    const desc = await this.remoteConnection.createAnswer();
+    this.remoteConnection.setLocalDescription(desc);
+    console.log(`Answer from remoteConnection`);
+    this.hostConnection.setRemoteDescription(desc);
 
-  private onIceCandidate(pc: RTCPeerConnection, event: RTCPeerConnectionIceEvent) {
-    this.getOtherPc(pc)
-      .addIceCandidate(event.candidate!)
-      .then(() => console.log('AddIceCandidate success.'))
-      .catch((error: any) => console.log(`Failed to add Ice Candidate: ${error.toString()}`));
-  }
-
-  private getOtherPc(pc: RTCPeerConnection) {
-    return (pc === this.hostConnection) ? this.remoteConnection : this.hostConnection;
+    this.remoteConnection.onicecandidate = e => {
+      if(e.candidate) {
+        // this.hostConnection.addIceCandidate(e.candidate);
+        this.candidate = JSON.stringify(e.candidate);
+        this.dc.detectChanges();
+      }
+    };
   }
 
   private onSendChannelStateChange() {
