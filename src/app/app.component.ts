@@ -21,7 +21,9 @@ export class AppComponent {
   offerControl = new FormControl('');
   messageControl = new FormControl('');
   candidateControl = new FormControl('');
+  offerRemoteControl = new FormControl('');
   offerDesc = '';
+  offerRemote = '';
   candidate: any;
 
   message = signal('');
@@ -42,6 +44,7 @@ export class AppComponent {
   }
 
   syncHost() {
+    this.hostConnection.setRemoteDescription(JSON.parse(this.offerRemoteControl.value!));
     this.hostConnection.addIceCandidate(JSON.parse(this.candidateControl.value!));
   }
 
@@ -53,7 +56,7 @@ export class AppComponent {
     const desc = await this.remoteConnection.createAnswer();
     this.remoteConnection.setLocalDescription(desc);
     console.log(`Answer from remoteConnection`);
-    this.hostConnection.setRemoteDescription(desc);
+    this.offerRemote = JSON.stringify(desc);
 
     this.remoteConnection.onicecandidate = e => {
       if(e.candidate) {
