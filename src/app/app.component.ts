@@ -34,18 +34,18 @@ export class AppComponent {
     this.sendChannel.onopen = () => { this.onSendChannelStateChange() };
     this.sendChannel.onclose = () => { this.onSendChannelStateChange() };
 
-    this.remoteConnection = new RTCPeerConnection();
-    this.remoteConnection.onicecandidate = (e: any) => {
-      this.onIceCandidate(this.remoteConnection, e);
-    };
-    this.remoteConnection.ondatachannel = (event: any) => { this.receiveChannelCallback(event) };
-
     this.offer = await this.hostConnection.createOffer();
     this.offerDesc = JSON.stringify(this.offer);
     this.gotDescription();
   }
 
   createConnectionRemote() {
+    this.remoteConnection = new RTCPeerConnection();
+    this.remoteConnection.onicecandidate = (e: any) => {
+      this.onIceCandidate(this.remoteConnection, e);
+    };
+    this.remoteConnection.ondatachannel = (event: any) => { this.receiveChannelCallback(event) };
+
     const offer: any = JSON.parse(this.offerControl.value || '{}');
     this.remoteConnection.setRemoteDescription(offer);
     this.remoteConnection.createAnswer()
