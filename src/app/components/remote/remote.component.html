@@ -1,0 +1,16 @@
+<h1>remote</h1>
+<div>
+  <p>offer: {{offer}}</p>
+  <br />
+  <p>candidate: {{candidate}}</p>
+</div>
+<div>
+  <input type="text" placeholder="host offer" [formControl]="hostOfferControl"/>
+  <input type="text" placeholder="host candidate" [formControl]="hostCandidateControl"/>
+  <button (click)="syncWithHost()">sync</button>
+</div>
+<div>
+  <p>{{message()}}</p>
+  <input type="text" [formControl]="messageControl" />
+  <button (click)="sendDataToRemote()">send</button>
+</div>
