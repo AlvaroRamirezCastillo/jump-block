@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectorRef, inject } from '@angular/core';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Host } from './host';
 
@@ -9,15 +9,17 @@ import { Host } from './host';
   templateUrl: './host.component.html'
 })
 export class HostComponent implements OnInit {
+  private changeDetector = inject(ChangeDetectorRef);
   private host = new Host();
   offer = '';
   candidate = '';
+  message = signal('');
   messageControl = new FormControl('');
   remoteOfferControl = new FormControl('');
   remoteCandidateControl = new FormControl('');
 
   async ngOnInit() {
-    const { offer, candidate } = await this.host.createConnection();
+    const { offer, candidate } = await this.host.createConnection({ onReceiveMessageCallback: event => this.onReceiveMessageCallback(event) });
     this.offer = JSON.stringify(offer);
     this.candidate = JSON.stringify(candidate);
   }
@@ -31,5 +33,10 @@ export class HostComponent implements OnInit {
   sendDataToRemote() {
     const message = this.messageControl.value || '';
     this.host.sendDataToRemote(message);
+  }
+
+  private onReceiveMessageCallback(event: MessageEvent) {
+    this.message.set(event.data);
+    this.changeDetector.detectChanges();
   }
 }

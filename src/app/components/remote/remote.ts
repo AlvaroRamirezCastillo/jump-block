@@ -1,6 +1,7 @@
 export class Remote {
   private peerConnection: RTCPeerConnection;
   private offer!: RTCSessionDescriptionInit;
+  private channel!: RTCDataChannel;
 
   constructor() {
     this.peerConnection = new RTCPeerConnection();
@@ -30,8 +31,13 @@ export class Remote {
   private receiveChannel({ onReceiveMessageCallback }: { onReceiveMessageCallback: (event: MessageEvent) => void }) {
     this.peerConnection.ondatachannel = event => {
       const { channel } = event;
+      this.channel = channel;
       channel.onmessage = event => { onReceiveMessageCallback(event) };
     };
+  }
+
+  sendDataToRemote(data: string) {
+    this.channel.send(data);
   }
 
   syncWithHost({ candidate }: { candidate: RTCIceCandidateInit }) {

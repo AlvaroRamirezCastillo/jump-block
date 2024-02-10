@@ -10,6 +10,7 @@ import { Remote } from './remote';
 })
 export class RemoteComponent {
   private changeDetector = inject(ChangeDetectorRef);
+  private remote = new Remote();
   message = signal('');
   messageControl = new FormControl('');
   hostOfferControl = new FormControl('');
@@ -20,19 +21,19 @@ export class RemoteComponent {
   async syncWithHost() {
     const hostOffer = JSON.parse(this.hostOfferControl.value || '') as RTCSessionDescriptionInit;
     const hostCandidate = JSON.parse(this.hostCandidateControl.value || '') as RTCIceCandidateInit;
-    const remote = new Remote();
-    const { candidate, offer } = await remote.createConnection({ offer: hostOffer, onReceiveMessageCallback: event => this.onReceiveMessageCallback(event) })
+    const { candidate, offer } = await this.remote.createConnection({ offer: hostOffer, onReceiveMessageCallback: event => this.onReceiveMessageCallback(event) })
 
     this.offer = JSON.stringify(offer);
     this.candidate = JSON.stringify(candidate);
-    remote.syncWithHost({ candidate: hostCandidate });
+    this.remote.syncWithHost({ candidate: hostCandidate });
   }
 
   sendDataToRemote() {
+    const message = this.messageControl.value || '';
+    this.remote.sendDataToRemote(message);
   }
 
   private onReceiveMessageCallback(event: MessageEvent) {
-    console.log('Received Message 11111', event.data);
     this.message.set(event.data);
     this.changeDetector.detectChanges();
   }

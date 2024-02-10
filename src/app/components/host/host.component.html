@@ -9,6 +9,7 @@
   <button (click)="syncWithRemote()">sync</button>
 </div>
 <div>
+  <p>{{message()}}</p>
   <input type="text" [formControl]="messageControl" />
   <button (click)="sendDataToRemote()">send</button>
 </div>
