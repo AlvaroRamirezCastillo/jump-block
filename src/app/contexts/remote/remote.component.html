@@ -1,0 +1,10 @@
+<h1>remote 123</h1>
+<div>
+  <input type="text" placeholder="key host" [formControl]="keyHostControl" />
+  <button (click)="syncWithHost()">sync</button>
+</div>
+<div>
+  <p>{{message()}}</p>
+  <input type="text" [formControl]="messageControl" />
+  <button (click)="sendDataToRemote()">send</button>
+</div>

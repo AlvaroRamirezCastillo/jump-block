@@ -1,32 +1,29 @@
-import { Component, OnInit, signal, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, signal, ChangeDetectorRef, inject } from '@angular/core';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
+import { ButtonComponent } from '@shared-kernel/components/button/button.component';
 import { Host } from './host';
 
 @Component({
   selector: 'app-host',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, ButtonComponent],
   templateUrl: './host.component.html'
 })
-export class HostComponent implements OnInit {
+export class HostComponent {
   private changeDetector = inject(ChangeDetectorRef);
   private host = new Host();
-  offer = '';
-  candidate = '';
   message = signal('');
   messageControl = new FormControl('');
-  remoteOfferControl = new FormControl('');
-  remoteCandidateControl = new FormControl('');
+  keyRemoteControl = new FormControl('');
 
-  async ngOnInit() {
+  async copyKeyHost() {
     const { offer, candidate } = await this.host.createConnection({ onReceiveMessageCallback: event => this.onReceiveMessageCallback(event) });
-    this.offer = JSON.stringify(offer);
-    this.candidate = JSON.stringify(candidate);
+    const key = btoa(JSON.stringify({ offer, candidate }));
+    navigator.clipboard.writeText(key);
   }
 
   syncWithRemote() {
-    const candidate = JSON.parse(this.remoteCandidateControl.value || '') as RTCIceCandidateInit;
-    const offer = JSON.parse(this.remoteOfferControl.value || '') as RTCSessionDescriptionInit;
+    const { candidate, offer } = JSON.parse(atob(this.keyRemoteControl.value || '')) as { candidate: RTCIceCandidateInit; offer: RTCSessionDescriptionInit };
     this.host.syncWithRemote({ candidate, offer });
   }
 

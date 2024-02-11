@@ -1,0 +1,22 @@
+:host {
+  display: block;
+
+  .button-retro {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 16px;
+    padding: 10px 20px;
+    background-color: var(--deep-purple-200);
+    border: 2px solid var(--deep-purple-A400);
+    border-radius: 5px;
+    color: var(--deep-purple-900);
+    cursor: pointer;
+    width: 100%;
+    height: 4rem;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .button-retro:hover {
+    background-color: var(--deep-purple-A700);
+    color: var(--deep-purple-100);
+  }
+}

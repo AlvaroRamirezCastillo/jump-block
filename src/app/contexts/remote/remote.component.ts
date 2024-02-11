@@ -13,19 +13,18 @@ export class RemoteComponent {
   private remote = new Remote();
   message = signal('');
   messageControl = new FormControl('');
-  hostOfferControl = new FormControl('');
-  hostCandidateControl = new FormControl('');
+  keyHostControl = new FormControl('');
   offer = '';
   candidate = '';
 
   async syncWithHost() {
-    const hostOffer = JSON.parse(this.hostOfferControl.value || '') as RTCSessionDescriptionInit;
-    const hostCandidate = JSON.parse(this.hostCandidateControl.value || '') as RTCIceCandidateInit;
-    const { candidate, offer } = await this.remote.createConnection({ offer: hostOffer, onReceiveMessageCallback: event => this.onReceiveMessageCallback(event) })
+    const keyHost = JSON.parse(atob(this.keyHostControl.value || '')) as { candidate: RTCIceCandidateInit; offer: RTCSessionDescriptionInit };
+    const { candidate, offer } = await this.remote.createConnection({ offer: keyHost.offer, onReceiveMessageCallback: event => this.onReceiveMessageCallback(event) })
 
-    this.offer = JSON.stringify(offer);
-    this.candidate = JSON.stringify(candidate);
-    this.remote.syncWithHost({ candidate: hostCandidate });
+    const key = btoa(JSON.stringify({ offer, candidate }));
+    navigator.clipboard.writeText(key);
+
+    this.remote.syncWithHost({ candidate: keyHost.candidate });
   }
 
   sendDataToRemote() {

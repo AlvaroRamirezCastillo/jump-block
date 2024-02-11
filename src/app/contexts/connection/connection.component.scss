@@ -1,0 +1,27 @@
+:host {
+  display: grid;
+  height: 100vh;
+  grid-template-columns: 1fr;
+  grid-template-rows: .8fr 1fr;
+
+  header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    h1 {
+      font-family: 'Courier New', Courier, monospace;
+      color: var(--deep-purple-900);
+      text-align: center;
+    }
+  }
+
+  section {
+    display: block;
+    padding: .4rem;
+
+    app-button {
+      margin: .4rem;
+    }
+  }
+}
