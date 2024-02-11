@@ -1,6 +1,7 @@
 import { Component, signal, ChangeDetectorRef, inject } from '@angular/core';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Remote } from './remote';
+import copy from 'copy-to-clipboard';
 
 @Component({
   selector: 'app-remote',
@@ -22,7 +23,7 @@ export class RemoteComponent {
     const { candidate, offer } = await this.remote.createConnection({ offer: keyHost.offer, onReceiveMessageCallback: event => this.onReceiveMessageCallback(event) })
 
     const key = btoa(JSON.stringify({ offer, candidate }));
-    navigator.clipboard.writeText(key);
+    copy(key);
 
     this.remote.syncWithHost({ candidate: keyHost.candidate });
   }
