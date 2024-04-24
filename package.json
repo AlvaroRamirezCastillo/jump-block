@@ -10,6 +10,7 @@
   },
   "private": true,
   "dependencies": {
+    "@acme/ui-components": "file:acme-ui-components-1.0.0.tgz",
     "@angular/animations": "^17.1.0",
     "@angular/common": "^17.1.0",
     "@angular/compiler": "^17.1.0",
